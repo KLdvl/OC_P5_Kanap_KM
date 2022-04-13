@@ -17,7 +17,7 @@ fetch("http://localhost:3000/api/products/")
     console.log(err);
   });
 
-// Mapping function for API data
+// Mapping function from API data
 function createContent(datas) {
   for (let i = 0; i < datas.length; i++) {
     // Creating card for product
