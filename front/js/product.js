@@ -64,7 +64,7 @@ function addColors(data) {
   }
 }
 
-// Populating cart
+// Populating Local Storage
 function addItemToCart() {
   let existingStorage = JSON.parse(window.localStorage.getItem("allCouches"));
   if (existingStorage == null) {
@@ -81,4 +81,11 @@ function addItemToCart() {
     existingStorage.push(object);
     window.localStorage.setItem("allCouches", JSON.stringify(existingStorage));
   }
+}
+
+// Get array from local storage
+let returned;
+function parseJSON() {
+  let couches = localStorage.getItem("allCouches");
+  returned = JSON.parse(couches);
 }
