@@ -63,3 +63,22 @@ function addColors(data) {
     createElement("option", "value", data.colors[i], data.colors[i], colors);
   }
 }
+
+// Populating cart
+function addItemToCart() {
+  let existingStorage = JSON.parse(window.localStorage.getItem("allCouches"));
+  if (existingStorage == null) {
+    existingStorage = [];
+  }
+  let object = {
+    id: data._id,
+    color: colors.value,
+    quantity: quantity.value,
+  };
+  if (object.color === "" || object.quantity == 0) {
+    alert("Veuillez sélectionner une couleur et/ou renseigner une quantité");
+  } else {
+    existingStorage.push(object);
+    window.localStorage.setItem("allCouches", JSON.stringify(existingStorage));
+  }
+}
