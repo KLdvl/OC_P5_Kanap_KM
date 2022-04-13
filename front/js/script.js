@@ -1,3 +1,6 @@
+// Creating variable for items to inject
+const queryItems = document.getElementById("items");
+
 // Getting data from API
 let data;
 fetch("http://localhost:3000/api/products/")
@@ -8,17 +11,14 @@ fetch("http://localhost:3000/api/products/")
   })
   .then(function (value) {
     data = value;
-    mapArray(data);
+    createContent(data);
   })
   .catch(function (err) {
     console.log(err);
   });
 
-// Creating variable for items to inject
-const queryItems = document.getElementById("items");
-
 // Mapping function for API data
-function mapArray(datas) {
+function createContent(datas) {
   for (let i = 0; i < datas.length; i++) {
     // Creating card for product
     const productItem = `<a href="./product.html?id=${datas[i]._id}">
