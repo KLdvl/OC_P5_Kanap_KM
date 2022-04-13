@@ -1,9 +1,10 @@
 // Creating variable for items to inject
 const queryItems = document.getElementById("items");
+const serverUrl = "http://localhost:3000/api/products/";
 
 // Getting data from API
 let data;
-fetch("http://localhost:3000/api/products/")
+fetch(serverUrl)
   .then(function (res) {
     if (res.ok) {
       return res.json();
