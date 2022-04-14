@@ -29,6 +29,7 @@ function createContent(datas) {
   <p class="productDescription">${datas[i].description}</p>
 </article>
 </a>`;
+    // Insert template into DOM
     queryItems.insertAdjacentHTML("beforeend", productItem);
   }
 }

@@ -20,6 +20,7 @@ addToCart.addEventListener("click", function () {
 
 // Getting product from API
 let data;
+// Get data from single object from API
 fetch(`${serverUrl}${id}`)
   .then(function (res) {
     if (res.ok) {
@@ -27,6 +28,7 @@ fetch(`${serverUrl}${id}`)
     }
   })
   .then(function (value) {
+    // Add content to page
     data = value;
     createContent(data);
     populateContent(title, data.name);
@@ -71,29 +73,38 @@ function addColors(data) {
 
 // Populating Local Storage
 function addItemToCart() {
+  // Get values from localStorage
   let existingStorage = JSON.parse(window.localStorage.getItem("allCouches"));
   if (existingStorage == null) {
     existingStorage = [];
   }
+  // Define variable to modify string to number
   let parsedQuantity = parseInt(quantity.value);
+  // Create object with datas from selected item
   let object = {
     id: data._id,
     color: colors.value,
     quantity: parsedQuantity,
   };
+  // Check if options are selected
   if (object.color === "" || object.quantity == 0) {
     alert("Veuillez sélectionner une couleur et/ou renseigner une quantité");
   } else {
+    // Check if element exists in localStorage
     if (existingStorage.find((element) => element.color === object.color)) {
+      // Get index of existing element in localStorage
       let indexValue = existingStorage.findIndex(
         (element) => element.color === object.color
       );
+      // Increment value of stored element
       existingStorage[indexValue].quantity += object.quantity;
+      // Update localStorage with incremented value
       window.localStorage.setItem(
         "allCouches",
         JSON.stringify(existingStorage)
       );
     } else {
+      // Add object to localStorage
       existingStorage.push(object);
       window.localStorage.setItem(
         "allCouches",
