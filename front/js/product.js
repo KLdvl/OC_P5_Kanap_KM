@@ -13,6 +13,11 @@ const serverUrl = "http://localhost:3000/api/products/";
 // Creating variable for id of product
 const id = new URLSearchParams(window.location.search).get("id");
 
+// Create listener for addToCart
+addToCart.addEventListener("click", function () {
+  addItemToCart();
+});
+
 // Getting product from API
 let data;
 fetch(`${serverUrl}${id}`)
@@ -44,7 +49,7 @@ function populateContent(selector, content) {
 }
 
 // Creating html element & add attribute and value
-function createElement(htmlElement, attribute, attrValue, textValue, appendTo) {
+function createElement(htmlElement, appendTo, textValue, attribute, attrValue) {
   let element = document.createElement(htmlElement);
   if (attribute && attrValue) {
     element.setAttribute(attribute, attrValue);
@@ -60,7 +65,7 @@ function createElement(htmlElement, attribute, attrValue, textValue, appendTo) {
 // Adding all colors
 function addColors(data) {
   for (let i = 0; i < data.colors.length; i++) {
-    createElement("option", "value", data.colors[i], data.colors[i], colors);
+    createElement("option", colors, data.colors[i], "value", data.colors[i]);
   }
 }
 
@@ -70,22 +75,30 @@ function addItemToCart() {
   if (existingStorage == null) {
     existingStorage = [];
   }
+  let parsedQuantity = parseInt(quantity.value);
   let object = {
     id: data._id,
     color: colors.value,
-    quantity: quantity.value,
+    quantity: parsedQuantity,
   };
   if (object.color === "" || object.quantity == 0) {
     alert("Veuillez sélectionner une couleur et/ou renseigner une quantité");
   } else {
-    existingStorage.push(object);
-    window.localStorage.setItem("allCouches", JSON.stringify(existingStorage));
+    if (existingStorage.find((element) => element.color === object.color)) {
+      let indexValue = existingStorage.findIndex(
+        (element) => element.color === object.color
+      );
+      existingStorage[indexValue].quantity += object.quantity;
+      window.localStorage.setItem(
+        "allCouches",
+        JSON.stringify(existingStorage)
+      );
+    } else {
+      existingStorage.push(object);
+      window.localStorage.setItem(
+        "allCouches",
+        JSON.stringify(existingStorage)
+      );
+    }
   }
-}
-
-// Get array from local storage
-let returned;
-function parseJSON() {
-  let couches = localStorage.getItem("allCouches");
-  returned = JSON.parse(couches);
 }
