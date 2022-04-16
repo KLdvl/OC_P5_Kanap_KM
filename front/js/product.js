@@ -103,6 +103,7 @@ function addItemToCart() {
         "allCouches",
         JSON.stringify(existingStorage)
       );
+      window.location.href = "cart.html";
     } else {
       // Add object to localStorage
       existingStorage.push(object);
@@ -110,6 +111,7 @@ function addItemToCart() {
         "allCouches",
         JSON.stringify(existingStorage)
       );
+      window.location.href = "cart.html";
     }
   }
 }

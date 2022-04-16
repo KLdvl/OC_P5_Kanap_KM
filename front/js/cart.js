@@ -30,6 +30,7 @@ fetch(serverUrl)
   .then(function (value) {
     data = value;
     getLocalStorage();
+    createCartElement(storage, data);
   })
   .catch(function (err) {
     console.log(err);
@@ -62,15 +63,19 @@ function createCartElement(localStored, apiData) {
     let apiElement = [...apiData].find(
       (element) => element._id === localStored[i].id
     );
+
     // Create H2 element for name
     const h2 = createHTML("h2");
     h2.innerHTML = apiElement.name;
+
     // Create p element for color
     const color = createHTML("p");
     color.innerHTML = localStored[i].color;
+
     // Create p element for price
     const price = createHTML("p");
     price.innerHTML = apiElement.price + " €";
+
     // Create div for item description and add html elements inside
     const divContentDescription = createHTML(
       "div",
@@ -79,9 +84,11 @@ function createCartElement(localStored, apiData) {
     divContentDescription.appendChild(h2);
     divContentDescription.appendChild(color);
     divContentDescription.appendChild(price);
+
     // Create p element for quantity
     const quantity = createHTML("p");
     quantity.innerHTML = "Qté : " + localStored[i].quantity;
+
     // Create input element for modifying quantity
     const input = createHTML("input", "itemQuantity");
     input.setAttribute("type", "number");
@@ -89,6 +96,7 @@ function createCartElement(localStored, apiData) {
     input.setAttribute("min", 1);
     input.setAttribute("max", 100);
     input.setAttribute("value", localStored[i].quantity);
+
     // Create div for item settings quantity & input modifier
     const divContentSettingsQuant = createHTML(
       "div",
@@ -99,12 +107,14 @@ function createCartElement(localStored, apiData) {
     // Create p element for deleting item
     const deleteItem = createHTML("p", "deleteItem");
     deleteItem.innerHTML = "Supprimer";
+
     // Create div for item settings quantity delete
     const divContentSettingsDel = createHTML(
       "div",
       "cart__item__content__settings__delete"
     );
     divContentSettingsDel.appendChild(deleteItem);
+
     // Create div for item settings and add html elements inside
     const divContentSettings = createHTML(
       "div",
@@ -112,25 +122,29 @@ function createCartElement(localStored, apiData) {
     );
     divContentSettings.appendChild(divContentSettingsQuant);
     divContentSettings.appendChild(divContentSettingsDel);
+
     // Create div for item content
     const divContent = createHTML("div", "cart__item__content");
     divContent.appendChild(divContentDescription);
     divContent.appendChild(divContentSettings);
+
     // Create img element for image & alt
     const image = createHTML("img");
     image.setAttribute("src", apiElement.imageUrl);
     image.setAttribute("alt", apiElement.altTxt);
+
     // Create div for item image
     const divImage = createHTML("div", "cart__item__img");
     divImage.appendChild(image);
+
     // Create article for each item
     const article = createHTML("article", "cart__item");
     article.setAttribute("data-id", localStored[i].id);
     article.setAttribute("data-color", localStored[i].color);
     article.appendChild(divImage);
     article.appendChild(divContent);
+
     // Add each item to cart
     cartItems.appendChild(article);
-    console.log(article);
   }
 }
