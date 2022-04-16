@@ -148,3 +148,29 @@ function createCartElement(localStored, apiData) {
     cartItems.appendChild(article);
   }
 }
+
+// Function to calculate number of items & total price
+function calculateTotal(storage, apiData) {
+  // Calculate total number of items
+  const itemTotal = [...storage]
+    .map((item) => item.quantity)
+    .reduce((previousValue, currentValue) => previousValue + currentValue);
+  totalQuantity.innerHTML = itemTotal;
+
+  // Calculate total price
+  let arrayPrice = [];
+  // Loop through local storage
+  for (let i = 0; i < storage.length; i++) {
+    // Create variable that matches element in cart and element in global API
+    let apiElement = [...apiData].find(
+      (element) => element._id === storage[i].id
+    );
+    // Add prices to array
+    arrayPrice.push(apiElement.price * storage[i].quantity);
+  }
+  // Sum of all prices in array
+  const priceTotal = arrayPrice.reduce(
+    (previousValue, currentValue) => previousValue + currentValue
+  );
+  totalPrice.innerHTML = priceTotal;
+}
