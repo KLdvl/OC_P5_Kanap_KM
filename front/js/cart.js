@@ -19,7 +19,9 @@ const formCityError = document.getElementById("cityErrorMsg");
 const formEmail = document.getElementById("email");
 const formEmailError = document.getElementById("emailErrorMsg");
 
+// ********************************************************************************
 // Getting data from API
+// ********************************************************************************
 let data;
 fetch(serverUrl)
   .then(function (res) {
@@ -31,13 +33,16 @@ fetch(serverUrl)
     data = value;
     getLocalStorage();
     createCartElement(storage, data);
+    calculateTotal(storage, data);
+    modifyProducts();
   })
   .catch(function (err) {
     console.log(err);
   });
 
+// ********************************************************************************
 // Get datas from localStorage
-
+// ********************************************************************************
 function getLocalStorage() {
   let existingStorage = JSON.parse(window.localStorage.getItem("allCouches"));
   if (existingStorage == null) {
@@ -46,7 +51,9 @@ function getLocalStorage() {
   return existingStorage;
 }
 
-// Create element
+// ********************************************************************************
+// Create html element and add class if needed
+// ********************************************************************************
 function createHTML(htmlElement, classElement) {
   let element = document.createElement(htmlElement);
   if (classElement) {
@@ -55,7 +62,9 @@ function createHTML(htmlElement, classElement) {
   return element;
 }
 
+// ********************************************************************************
 // Create cart element
+// ********************************************************************************
 function createCartElement(localStored, apiData) {
   // Loop through all localStorage elements
   for (let i = 0; i < localStored.length; i++) {
@@ -148,8 +157,9 @@ function createCartElement(localStored, apiData) {
     cartItems.appendChild(article);
   }
 }
-
+// ********************************************************************************
 // Function to calculate number of items & total price
+// ********************************************************************************
 function calculateTotal(storage, apiData) {
   // Calculate total number of items
   const itemTotal = [...storage]
@@ -159,18 +169,51 @@ function calculateTotal(storage, apiData) {
 
   // Calculate total price
   let arrayPrice = [];
+
   // Loop through local storage
   for (let i = 0; i < storage.length; i++) {
     // Create variable that matches element in cart and element in global API
     let apiElement = [...apiData].find(
       (element) => element._id === storage[i].id
     );
+
     // Add prices to array
     arrayPrice.push(apiElement.price * storage[i].quantity);
   }
+
   // Sum of all prices in array
   const priceTotal = arrayPrice.reduce(
     (previousValue, currentValue) => previousValue + currentValue
   );
   totalPrice.innerHTML = priceTotal;
+}
+
+function modifyProducts() {
+  // Create node list for each element in cart
+  const itemQuantityInput = document.getElementsByClassName("itemQuantity");
+  // Loop through all items that have the class "itemQuantity"
+  [...itemQuantityInput].forEach((item) => {
+    // Create variables for selecting parent node with attributes
+    let articleItem = item.parentNode.parentNode.parentNode.parentNode;
+    let articleItemIdAttr = articleItem.getAttribute("data-id");
+    let articleItemColorAttr = articleItem.getAttribute("data-color");
+    // Add event listener for each input
+    item.addEventListener("change", (event) => {
+      event.preventDefault();
+      for (let i = 0; i < storage.length; i++) {
+        // Check attributes
+        if (
+          storage[i].id === articleItemIdAttr &&
+          storage[i].color === articleItemColorAttr
+        ) {
+          // Convert value into number and modify storage
+          let parsedValue = parseInt(item.value);
+          storage[i].quantity = parsedValue;
+          // Set updated value to local Storage & reload page
+          window.localStorage.setItem("allCouches", JSON.stringify(storage));
+          location.reload();
+        }
+      }
+    });
+  });
 }
