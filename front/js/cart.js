@@ -157,6 +157,7 @@ function createCartElement(localStored, apiData) {
     cartItems.appendChild(article);
   }
 }
+
 // ********************************************************************************
 // Function to calculate number of items & total price
 // ********************************************************************************
@@ -187,16 +188,47 @@ function calculateTotal(storage, apiData) {
   );
   totalPrice.innerHTML = priceTotal;
 }
-
+// ********************************************************************************
+// Function to modify products quantity in cart
+// ********************************************************************************
 function modifyProducts() {
   // Create node list for each element in cart
   const itemQuantityInput = document.getElementsByClassName("itemQuantity");
+  const suppressButton = document.getElementsByClassName("deleteItem");
+
+  // Loop through all deleteItems
+  [...suppressButton].forEach((item) => {
+    // Create variables for selecting parent node with attributes
+    let articleItem = item.parentNode.parentNode.parentNode.parentNode;
+    let articleItemIdAttr = articleItem.getAttribute("data-id");
+    let articleItemColorAttr = articleItem.getAttribute("data-color");
+
+    // Add event listener for each button
+    item.addEventListener("click", () => {
+      for (let i = 0; i < storage.length; i++) {
+        // Check attributes
+        if (
+          storage[i].id === articleItemIdAttr &&
+          storage[i].color === articleItemColorAttr
+        ) {
+          // Suppress item from DOM & storage
+          articleItem.remove();
+          storage.splice(i, 1);
+          // Set updated value to local Storage & reload page
+          window.localStorage.setItem("allCouches", JSON.stringify(storage));
+          location.reload();
+        }
+      }
+    });
+  });
+
   // Loop through all items that have the class "itemQuantity"
   [...itemQuantityInput].forEach((item) => {
     // Create variables for selecting parent node with attributes
     let articleItem = item.parentNode.parentNode.parentNode.parentNode;
     let articleItemIdAttr = articleItem.getAttribute("data-id");
     let articleItemColorAttr = articleItem.getAttribute("data-color");
+
     // Add event listener for each input
     item.addEventListener("change", (event) => {
       event.preventDefault();
@@ -209,6 +241,7 @@ function modifyProducts() {
           // Convert value into number and modify storage
           let parsedValue = parseInt(item.value);
           storage[i].quantity = parsedValue;
+
           // Set updated value to local Storage & reload page
           window.localStorage.setItem("allCouches", JSON.stringify(storage));
           location.reload();

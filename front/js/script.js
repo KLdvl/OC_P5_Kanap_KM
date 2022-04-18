@@ -2,7 +2,9 @@
 const queryItems = document.getElementById("items");
 const serverUrl = "http://localhost:3000/api/products/";
 
+// ********************************************************************************
 // Getting data from API
+// ********************************************************************************
 let data;
 fetch(serverUrl)
   .then(function (res) {
@@ -18,7 +20,9 @@ fetch(serverUrl)
     console.log(err);
   });
 
+// ********************************************************************************
 // Mapping function from API data
+// ********************************************************************************
 function createContent(datas) {
   for (let i = 0; i < datas.length; i++) {
     // Creating card for product

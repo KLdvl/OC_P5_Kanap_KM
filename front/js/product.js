@@ -40,17 +40,24 @@ fetch(`${serverUrl}${id}`)
     console.log(err);
   });
 
-// Mapping function from API data (unique product)
+// ********************************************************************************
+// Function to map from API data (unique product)
+// ********************************************************************************
 function createContent(datas) {
   const productImg = `<img src="${datas.imageUrl}" alt="${datas.altTxt}">`;
   image.insertAdjacentHTML("beforeend", productImg);
 }
+
+// ********************************************************************************
 // Populating function for HTML text
+// ********************************************************************************
 function populateContent(selector, content) {
   selector.innerHTML = content;
 }
 
-// Creating html element & add attribute and value
+// ********************************************************************************
+// Function to create html element & add attribute and value
+// ********************************************************************************
 function createElement(htmlElement, appendTo, textValue, attribute, attrValue) {
   let element = document.createElement(htmlElement);
   if (attribute && attrValue) {
@@ -64,28 +71,35 @@ function createElement(htmlElement, appendTo, textValue, attribute, attrValue) {
   }
 }
 
-// Adding all colors
+// ********************************************************************************
+// Function to add all colors
+// ********************************************************************************
 function addColors(data) {
   for (let i = 0; i < data.colors.length; i++) {
     createElement("option", colors, data.colors[i], "value", data.colors[i]);
   }
 }
 
-// Populating Local Storage
+// ********************************************************************************
+// Function for populating Local Storage
+// ********************************************************************************
 function addItemToCart() {
   // Get values from localStorage
   let existingStorage = JSON.parse(window.localStorage.getItem("allCouches"));
   if (existingStorage == null) {
     existingStorage = [];
   }
+
   // Define variable to modify string to number
   let parsedQuantity = parseInt(quantity.value);
+
   // Create object with datas from selected item
   let object = {
     id: data._id,
     color: colors.value,
     quantity: parsedQuantity,
   };
+
   // Check if options are selected
   if (object.color === "" || object.quantity == 0) {
     alert("Veuillez sélectionner une couleur et/ou renseigner une quantité");
@@ -96,8 +110,10 @@ function addItemToCart() {
       let indexValue = existingStorage.findIndex(
         (element) => element.color === object.color
       );
+
       // Increment value of stored element
       existingStorage[indexValue].quantity += object.quantity;
+
       // Update localStorage with incremented value
       window.localStorage.setItem(
         "allCouches",
