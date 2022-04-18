@@ -35,6 +35,11 @@ fetch(serverUrl)
     createCartElement(storage, data);
     calculateTotal(storage, data);
     modifyProducts();
+    checkForm(formFirstName, nameRegex, formFirstNameError, errorMessages[0]);
+    checkForm(formLastName, nameRegex, formLastNameError, errorMessages[1]);
+    checkForm(formAddress, addressRegex, formAddressError, errorMessages[2]);
+    checkForm(formCity, cityRegex, formCityError, errorMessages[3]);
+    checkForm(formEmail, emailRegex, formEmailError, errorMessages[4]);
   })
   .catch(function (err) {
     console.log(err);
@@ -248,5 +253,41 @@ function modifyProducts() {
         }
       }
     });
+  });
+}
+
+// ********************************************************************************
+// Regex for each form element
+// ********************************************************************************
+const nameRegex = new RegExp("^[a-zA-Z àâäéèêëïîôöùûüç'-,.]+$");
+const addressRegex = new RegExp(
+  "^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç'-]+)+"
+);
+const cityRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç'-]+$");
+const emailRegex = new RegExp(
+  "^[a-zA-Z0-9-_]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
+);
+// Error messages for each case
+const errorMessages = [
+  "Le prénom ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "Le nom de famille ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "L'adresse entrée doit être valide",
+  "La ville ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "L'addresse email doit être valide",
+];
+// ********************************************************************************
+// Function to check each item of the form
+// ********************************************************************************
+function checkForm(formElement, regexType, formElementError, message) {
+  formElement.addEventListener("input", (e) => {
+    if (e.target.value === null || e.target.value === "") {
+      formElementError.innerHTML = "";
+    } else {
+      if (regexType.test(e.target.value) === true) {
+        formElementError.innerHTML = "";
+      } else {
+        formElementError.innerHTML = message;
+      }
+    }
   });
 }
