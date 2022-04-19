@@ -254,12 +254,16 @@ function modifyProducts() {
           storage[i].color === articleItemColorAttr
         ) {
           // Convert value into number and modify storage
-          let parsedValue = parseInt(item.value);
-          storage[i].quantity = parsedValue;
+          if (item.value <= 0 || item.value > 100) {
+            alert("Le nombre de produits doit être compris entre 1 et 100");
+          } else {
+            let parsedValue = parseInt(item.value);
+            storage[i].quantity = parsedValue;
 
-          // Set updated value to local Storage & reload page
-          window.localStorage.setItem("allCouches", JSON.stringify(storage));
-          location.reload();
+            // Set updated value to local Storage & reload page
+            window.localStorage.setItem("allCouches", JSON.stringify(storage));
+            location.reload();
+          }
         }
       }
     });
