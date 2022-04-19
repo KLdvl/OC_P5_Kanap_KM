@@ -101,8 +101,10 @@ function addItemToCart() {
   };
 
   // Check if options are selected
-  if (object.color === "" || object.quantity == 0) {
-    alert("Veuillez sélectionner une couleur et/ou renseigner une quantité");
+  if (object.color === "" || object.quantity == 0 || object.quantity > 100) {
+    alert(
+      "Veuillez sélectionner une couleur et/ou renseigner une quantité entre 1 et 100"
+    );
   } else {
     // Check if element exists in localStorage
     if (existingStorage.find((element) => element.color === object.color)) {
