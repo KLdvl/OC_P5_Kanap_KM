@@ -322,6 +322,10 @@ function passOrder() {
       alert("Veuillez renseigner le formulaire correctement");
     } else {
       event.preventDefault();
+      let productId = [];
+      for (let i = 0; i < storage.length; i++) {
+        productId.push(storage[i].id);
+      }
       let order = {
         contact: {
           firstName: formFirstName.value,
@@ -330,9 +334,29 @@ function passOrder() {
           city: formCity.value,
           email: formEmail.value,
         },
-        products: storage,
+        products: productId,
       };
-      console.log(order);
+      // Envoi du formulaire
+      const orderJson = JSON.stringify(order);
+
+      fetch(serverUrl + "order", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: orderJson,
+      })
+        .then((res) => {
+          return res.json();
+        })
+        .then((data) => {
+          console.log(data.orderId);
+          window.location.href = "confirmation.html?orderId=" + data.orderId;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   });
 }
