@@ -351,7 +351,6 @@ function passOrder() {
           return res.json();
         })
         .then((data) => {
-          console.log(data.orderId);
           window.location.href = "confirmation.html?orderId=" + data.orderId;
         })
         .catch((err) => {
