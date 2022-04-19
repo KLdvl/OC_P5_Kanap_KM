@@ -40,6 +40,7 @@ fetch(serverUrl)
     checkForm(formAddress, addressRegex, formAddressError, errorMessages[2]);
     checkForm(formCity, cityRegex, formCityError, errorMessages[3]);
     checkForm(formEmail, emailRegex, formEmailError, errorMessages[4]);
+    passOrder();
   })
   .catch(function (err) {
     console.log(err);
@@ -168,10 +169,16 @@ function createCartElement(localStored, apiData) {
 // ********************************************************************************
 function calculateTotal(storage, apiData) {
   // Calculate total number of items
-  const itemTotal = [...storage]
-    .map((item) => item.quantity)
-    .reduce((previousValue, currentValue) => previousValue + currentValue);
-  totalQuantity.innerHTML = itemTotal;
+  let itemTotal;
+  if (storage.length === 0) {
+    itemTotal = 0;
+    totalQuantity.innerHTML = itemTotal;
+  } else {
+    itemTotal = [...storage]
+      .map((item) => item.quantity)
+      .reduce((previousValue, currentValue) => previousValue + currentValue);
+    totalQuantity.innerHTML = itemTotal;
+  }
 
   // Calculate total price
   let arrayPrice = [];
@@ -186,12 +193,15 @@ function calculateTotal(storage, apiData) {
     // Add prices to array
     arrayPrice.push(apiElement.price * storage[i].quantity);
   }
-
-  // Sum of all prices in array
-  const priceTotal = arrayPrice.reduce(
-    (previousValue, currentValue) => previousValue + currentValue
-  );
-  totalPrice.innerHTML = priceTotal;
+  if (arrayPrice.length === 0) {
+    totalPrice.innerHTML = 0;
+  } else {
+    // Sum of all prices in array
+    const priceTotal = arrayPrice.reduce(
+      (previousValue, currentValue) => previousValue + currentValue
+    );
+    totalPrice.innerHTML = priceTotal;
+  }
 }
 // ********************************************************************************
 // Function to modify products quantity in cart
@@ -275,6 +285,7 @@ const errorMessages = [
   "La ville ne doit pas contenir de chiffres ou de caractères spéciaux",
   "L'addresse email doit être valide",
 ];
+
 // ********************************************************************************
 // Function to check each item of the form
 // ********************************************************************************
@@ -288,6 +299,40 @@ function checkForm(formElement, regexType, formElementError, message) {
       } else {
         formElementError.innerHTML = message;
       }
+    }
+  });
+}
+
+// ********************************************************************************
+// Function to check if form is filled
+// ********************************************************************************
+function passOrder() {
+  order.addEventListener("click", (event) => {
+    if (storage.length === 0) {
+      event.preventDefault();
+      alert("Veuillez ajouter un ou plusieurs objets dans votre panier");
+    } else if (
+      !nameRegex.test(formFirstName.value) ||
+      !nameRegex.test(formLastName.value) ||
+      !addressRegex.test(formAddress.value) ||
+      !cityRegex.test(formCity.value) ||
+      !emailRegex.test(formEmail.value)
+    ) {
+      event.preventDefault();
+      alert("Veuillez renseigner le formulaire correctement");
+    } else {
+      event.preventDefault();
+      let order = {
+        contact: {
+          firstName: formFirstName.value,
+          lastName: formLastName.value,
+          address: formAddress.value,
+          city: formCity.value,
+          email: formEmail.value,
+        },
+        products: storage,
+      };
+      console.log(order);
     }
   });
 }
