@@ -5,15 +5,13 @@ const serverUrl = "http://localhost:3000/api/products/";
 // ********************************************************************************
 // Getting data from API
 // ********************************************************************************
-let data;
 fetch(serverUrl)
   .then(function (res) {
     if (res.ok) {
       return res.json();
     }
   })
-  .then(function (value) {
-    data = value;
+  .then(function (data) {
     createContent(data);
   })
   .catch(function (err) {
@@ -23,14 +21,14 @@ fetch(serverUrl)
 // ********************************************************************************
 // Mapping function from API data
 // ********************************************************************************
-function createContent(datas) {
-  for (let i = 0; i < datas.length; i++) {
+function createContent(item) {
+  for (let i = 0; i < item.length; i++) {
     // Creating card for product
-    const productItem = `<a href="./product.html?id=${datas[i]._id}">
+    const productItem = `<a href="./product.html?id=${item[i]._id}">
 <article>
-  <img src="${datas[i].imageUrl}" alt="${datas[i].altTxt}">
-  <h3 class="productName">${datas[i].name}</h3>
-  <p class="productDescription">${datas[i].description}</p>
+  <img src="${item[i].imageUrl}" alt="${item[i].altTxt}">
+  <h3 class="productName">${item[i].name}</h3>
+  <p class="productDescription">${item[i].description}</p>
 </article>
 </a>`;
     // Insert template into DOM
