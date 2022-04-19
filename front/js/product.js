@@ -19,7 +19,6 @@ addToCart.addEventListener("click", function () {
 });
 
 // Getting product from API
-let data;
 // Get data from single object from API
 fetch(`${serverUrl}${id}`)
   .then(function (res) {
@@ -27,9 +26,8 @@ fetch(`${serverUrl}${id}`)
       return res.json();
     }
   })
-  .then(function (value) {
+  .then(function (data) {
     // Add content to page
-    data = value;
     createContent(data);
     populateContent(title, data.name);
     populateContent(price, data.price);
