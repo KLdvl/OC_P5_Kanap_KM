@@ -19,6 +19,28 @@ const formFields = document.querySelectorAll(
 );
 
 // ********************************************************************************
+// Regex for each form element
+// ********************************************************************************
+const nameRegex = new RegExp("^[a-zA-Z àâäéèêëïîôöùûüç'-,.]+$");
+const addressRegex = new RegExp(
+  "^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç'-]+)+"
+);
+const cityRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç'-]+$");
+const emailRegex = new RegExp(
+  "^[a-zA-Z0-9-_]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
+);
+// Create array of regex
+const regexList = [nameRegex, nameRegex, addressRegex, cityRegex, emailRegex];
+// Create array of error messages for form field
+const errorMessages = [
+  "Le prénom ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "Le nom de famille ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "L'adresse entrée doit être valide",
+  "La ville ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "L'addresse email doit être valide",
+];
+
+// ********************************************************************************
 // Getting data from API
 // ********************************************************************************
 let data;
@@ -266,27 +288,6 @@ function modifyProducts() {
 }
 
 // ********************************************************************************
-// Regex for each form element
-// ********************************************************************************
-const nameRegex = new RegExp("^[a-zA-Z àâäéèêëïîôöùûüç'-,.]+$");
-const addressRegex = new RegExp(
-  "^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç'-]+)+"
-);
-const cityRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç'-]+$");
-const emailRegex = new RegExp(
-  "^[a-zA-Z0-9-_]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
-);
-const regexList = [nameRegex, nameRegex, addressRegex, cityRegex, emailRegex];
-// Error messages for each case
-const errorMessages = [
-  "Le prénom ne doit pas contenir de chiffres ou de caractères spéciaux",
-  "Le nom de famille ne doit pas contenir de chiffres ou de caractères spéciaux",
-  "L'adresse entrée doit être valide",
-  "La ville ne doit pas contenir de chiffres ou de caractères spéciaux",
-  "L'addresse email doit être valide",
-];
-
-// ********************************************************************************
 // Function to check each item of the form
 // ********************************************************************************
 function checkForm() {
@@ -354,6 +355,7 @@ function passOrder() {
       // Envoi du formulaire
       const orderJson = JSON.stringify(order);
 
+      // POST method for order & contact
       fetch(serverUrl + "order", {
         method: "POST",
         headers: {
