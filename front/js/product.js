@@ -18,7 +18,6 @@ addToCart.addEventListener("click", function () {
   addItemToCart();
 });
 
-// Getting product from API
 // Get data from single object from API
 fetch(`${serverUrl}${id}`)
   .then(function (res) {
@@ -29,9 +28,9 @@ fetch(`${serverUrl}${id}`)
   .then(function (data) {
     // Add content to page
     createContent(data);
-    populateContent(title, data.name);
-    populateContent(price, data.price);
-    populateContent(description, data.description);
+    title.innerHTML = data.name;
+    price.innerHTML = data.price;
+    description.innerHTML = data.description;
     addColors(data);
   })
   .catch(function (err) {
@@ -44,13 +43,6 @@ fetch(`${serverUrl}${id}`)
 function createContent(datas) {
   const productImg = `<img src="${datas.imageUrl}" alt="${datas.altTxt}">`;
   image.insertAdjacentHTML("beforeend", productImg);
-}
-
-// ********************************************************************************
-// Populating function for HTML text
-// ********************************************************************************
-function populateContent(selector, content) {
-  selector.innerHTML = content;
 }
 
 // ********************************************************************************
