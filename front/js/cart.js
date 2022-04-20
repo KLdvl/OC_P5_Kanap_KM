@@ -1,23 +1,22 @@
 // Creating variable for injecting items
 const serverUrl = "http://localhost:3000/api/products/";
 let storage = getLocalStorage();
+
 // Creating variables for selectors
 const cartItems = document.getElementById("cart__items");
 const totalQuantity = document.getElementById("totalQuantity");
 const totalPrice = document.getElementById("totalPrice");
 const order = document.getElementById("order");
 
-// Creating variables for form selectors & error messages
+// Creating variables for form selectors
 const formFirstName = document.getElementById("firstName");
-const formFirstNameError = document.getElementById("firstNameErrorMsg");
 const formLastName = document.getElementById("lastName");
-const formLastNameError = document.getElementById("lastNameErrorMsg");
 const formAddress = document.getElementById("address");
-const formAddressError = document.getElementById("addressErrorMsg");
 const formCity = document.getElementById("city");
-const formCityError = document.getElementById("cityErrorMsg");
 const formEmail = document.getElementById("email");
-const formEmailError = document.getElementById("emailErrorMsg");
+const formFields = document.querySelectorAll(
+  'input[type="text"],input[type="email"]'
+);
 
 // ********************************************************************************
 // Getting data from API
@@ -35,11 +34,7 @@ fetch(serverUrl)
     createCartElement(storage, data);
     calculateTotal(storage, data);
     modifyProducts();
-    checkForm(formFirstName, nameRegex, formFirstNameError, errorMessages[0]);
-    checkForm(formLastName, nameRegex, formLastNameError, errorMessages[1]);
-    checkForm(formAddress, addressRegex, formAddressError, errorMessages[2]);
-    checkForm(formCity, cityRegex, formCityError, errorMessages[3]);
-    checkForm(formEmail, emailRegex, formEmailError, errorMessages[4]);
+    checkForm();
     passOrder();
   })
   .catch(function (err) {
@@ -281,6 +276,7 @@ const cityRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç'-]+$");
 const emailRegex = new RegExp(
   "^[a-zA-Z0-9-_]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
 );
+const regexList = [nameRegex, nameRegex, addressRegex, cityRegex, emailRegex];
 // Error messages for each case
 const errorMessages = [
   "Le prénom ne doit pas contenir de chiffres ou de caractères spéciaux",
@@ -293,18 +289,33 @@ const errorMessages = [
 // ********************************************************************************
 // Function to check each item of the form
 // ********************************************************************************
-function checkForm(formElement, regexType, formElementError, message) {
-  formElement.addEventListener("input", (e) => {
-    if (e.target.value === null || e.target.value === "") {
-      formElementError.innerHTML = "";
-    } else {
-      if (regexType.test(e.target.value) === true) {
-        formElementError.innerHTML = "";
-      } else {
-        formElementError.innerHTML = message;
-      }
+function checkForm() {
+  class FormChecker {
+    constructor(formField, regex, message) {
+      (this.formField = formField),
+        (this.regex = regex),
+        (this.message = message);
     }
-  });
+  }
+  for (let i = 0; i < formFields.length; i++) {
+    let formElement = new FormChecker(
+      formFields[i],
+      regexList[i],
+      errorMessages[i]
+    );
+    let sibling = formElement.formField.nextElementSibling;
+    formElement.formField.addEventListener("input", (e) => {
+      if (
+        e.target.value === null ||
+        e.target.value === "" ||
+        formElement.regex.test(e.target.value) === true
+      ) {
+        sibling.innerHTML = "";
+      } else {
+        sibling.innerHTML = formElement.message;
+      }
+    });
+  }
 }
 
 // ********************************************************************************
