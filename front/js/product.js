@@ -65,20 +65,20 @@ function addColors(data) {
 // Function for populating Local Storage
 // ********************************************************************************
 function addItemToCart(data) {
-  // Get values from localStorage
+  // Get values from localStorage & create storage if not created
   let existingStorage = JSON.parse(window.localStorage.getItem("allCouches"));
   if (existingStorage == null) {
     existingStorage = [];
   }
-
-  // Define variable to modify string to number
-  let parsedQuantity = parseInt(quantity.value);
-
+  // Function to update Local Storage
+  function updateStorage() {
+    window.localStorage.setItem("allCouches", JSON.stringify(existingStorage));
+  }
   // Create object with datas from selected item
   let object = {
     id: data._id,
     color: colors.value,
-    quantity: parsedQuantity,
+    quantity: parseInt(quantity.value),
   };
 
   // Check if options are selected
@@ -98,18 +98,12 @@ function addItemToCart(data) {
       existingStorage[indexValue].quantity += object.quantity;
 
       // Update localStorage with incremented value
-      window.localStorage.setItem(
-        "allCouches",
-        JSON.stringify(existingStorage)
-      );
+      updateStorage();
       window.location.href = "cart.html";
     } else {
       // Add object to localStorage
       existingStorage.push(object);
-      window.localStorage.setItem(
-        "allCouches",
-        JSON.stringify(existingStorage)
-      );
+      updateStorage();
       window.location.href = "cart.html";
     }
   }
