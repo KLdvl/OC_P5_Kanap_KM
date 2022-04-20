@@ -77,10 +77,13 @@ function getLocalStorage() {
 // ********************************************************************************
 // Create html element and add class if needed
 // ********************************************************************************
-function createHTML(htmlElement, classElement) {
+function createHTML(htmlElement, classElement, innerContent) {
   let element = document.createElement(htmlElement);
   if (classElement) {
     element.classList.add(classElement);
+  }
+  if (innerContent) {
+    element.innerHTML = innerContent;
   }
   return element;
 }
@@ -97,32 +100,27 @@ function createCartElement(localStored, apiData) {
     );
 
     // Create H2 element for name
-    const h2 = createHTML("h2");
-    h2.innerHTML = apiElement.name;
+    // const h2 = createHTML("h2", "", apiElement.name);
 
     // Create p element for color
-    const color = createHTML("p");
-    color.innerHTML = localStored[i].color;
+    // const color = createHTML("p", "", localStored[i].color);
 
     // Create p element for price
-    const price = createHTML("p");
-    price.innerHTML = apiElement.price + " €";
+    // const price = createHTML("p", "", `${apiElement.price} €`);
 
     // Create div for item description and add html elements inside
     const divContentDescription = createHTML(
       "div",
       "cart__item__content__description"
     );
-    divContentDescription.appendChild(h2);
-    divContentDescription.appendChild(color);
-    divContentDescription.appendChild(price);
+    // divContentDescription.append(h2, color, price);
 
     // Create p element for quantity
-    const quantity = createHTML("p");
-    quantity.innerHTML = "Qté : " + localStored[i].quantity;
+    // const quantity = createHTML("p", "", `Qté : ${localStored[i].quantity}`);
 
     // Create input element for modifying quantity
     const input = createHTML("input", "itemQuantity");
+
     input.setAttribute("type", "number");
     input.setAttribute("name", "itemQuantity");
     input.setAttribute("min", 1);
@@ -134,11 +132,10 @@ function createCartElement(localStored, apiData) {
       "div",
       "cart__item__content__settings__quantity"
     );
-    divContentSettingsQuant.appendChild(quantity);
-    divContentSettingsQuant.appendChild(input);
+    divContentSettingsQuant.append(input);
+
     // Create p element for deleting item
-    const deleteItem = createHTML("p", "deleteItem");
-    deleteItem.innerHTML = "Supprimer";
+    const deleteItem = createHTML("p", "deleteItem", "Supprimer");
 
     // Create div for item settings quantity delete
     const divContentSettingsDel = createHTML(
@@ -152,13 +149,11 @@ function createCartElement(localStored, apiData) {
       "div",
       "cart__item__content__settings"
     );
-    divContentSettings.appendChild(divContentSettingsQuant);
-    divContentSettings.appendChild(divContentSettingsDel);
+    divContentSettings.append(divContentSettingsQuant, divContentSettingsDel);
 
     // Create div for item content
     const divContent = createHTML("div", "cart__item__content");
-    divContent.appendChild(divContentDescription);
-    divContent.appendChild(divContentSettings);
+    divContent.append(divContentDescription, divContentSettings);
 
     // Create img element for image & alt
     const image = createHTML("img");
@@ -173,11 +168,32 @@ function createCartElement(localStored, apiData) {
     const article = createHTML("article", "cart__item");
     article.setAttribute("data-id", localStored[i].id);
     article.setAttribute("data-color", localStored[i].color);
-    article.appendChild(divImage);
-    article.appendChild(divContent);
+    article.append(divImage, divContent);
 
     // Add each item to cart
     cartItems.appendChild(article);
+
+    class HtmlElement {
+      constructor(type, text, append) {
+        (this.type = type),
+          (this.text = text),
+          (this.append = append),
+          (this.createHtml = function () {
+            let element = document.createElement(this.type);
+            element.innerHTML = text;
+            append.append(element);
+          });
+        this.createHtml();
+      }
+    }
+    new HtmlElement("h2", apiElement.name, divContentDescription);
+    new HtmlElement("p", localStored[i].color, divContentDescription);
+    new HtmlElement("p", `${apiElement.price} €`, divContentDescription);
+    new HtmlElement(
+      "p",
+      `Qté : ${localStored[i].quantity}`,
+      divContentSettingsQuant
+    );
   }
 }
 
@@ -207,7 +223,7 @@ function calculateTotal(storage, apiData) {
       (element) => element._id === storage[i].id
     );
 
-    // Add prices to array
+    // Add prices to arrayPrice
     arrayPrice.push(apiElement.price * storage[i].quantity);
   }
   if (arrayPrice.length === 0) {
