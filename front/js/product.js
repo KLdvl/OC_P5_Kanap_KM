@@ -15,8 +15,11 @@ const id = new URLSearchParams(window.location.search).get("id");
 
 // Create listener for addToCart
 addToCart.addEventListener("click", function () {
-  addItemToCart();
+  addItemToCart(productData);
 });
+
+// Create variable with product data
+let productData;
 
 // Get data from single object from API
 fetch(`${serverUrl}${id}`)
@@ -26,6 +29,7 @@ fetch(`${serverUrl}${id}`)
     }
   })
   .then(function (data) {
+    productData = data;
     // Add content to page
     createContent(data);
     title.innerHTML = data.name;
@@ -46,34 +50,21 @@ function createContent(datas) {
 }
 
 // ********************************************************************************
-// Function to create html element & add attribute and value
-// ********************************************************************************
-function createElement(htmlElement, appendTo, textValue, attribute, attrValue) {
-  let element = document.createElement(htmlElement);
-  if (attribute && attrValue) {
-    element.setAttribute(attribute, attrValue);
-  }
-  if (textValue) {
-    element.innerHTML = textValue;
-  }
-  if (appendTo) {
-    appendTo.appendChild(element);
-  }
-}
-
-// ********************************************************************************
 // Function to add all colors
 // ********************************************************************************
 function addColors(data) {
-  for (let i = 0; i < data.colors.length; i++) {
-    createElement("option", colors, data.colors[i], "value", data.colors[i]);
+  for (let color of data.colors) {
+    let element = document.createElement("option");
+    element.setAttribute("value", color);
+    element.innerHTML = color;
+    colors.appendChild(element);
   }
 }
 
 // ********************************************************************************
 // Function for populating Local Storage
 // ********************************************************************************
-function addItemToCart() {
+function addItemToCart(data) {
   // Get values from localStorage
   let existingStorage = JSON.parse(window.localStorage.getItem("allCouches"));
   if (existingStorage == null) {
