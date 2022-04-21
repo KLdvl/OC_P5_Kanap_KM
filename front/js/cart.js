@@ -14,6 +14,7 @@ const formLastName = document.getElementById("lastName");
 const formAddress = document.getElementById("address");
 const formCity = document.getElementById("city");
 const formEmail = document.getElementById("email");
+// Selector used for checking form with Regex
 const formFields = document.querySelectorAll(
   'input[type="text"],input[type="email"]'
 );
@@ -224,6 +225,10 @@ function modifyProducts() {
   // Create node list for each element in cart
   const itemQuantityInput = document.getElementsByClassName("itemQuantity");
   const suppressButton = document.getElementsByClassName("deleteItem");
+  function updateStorage() {
+    window.localStorage.setItem("allCouches", JSON.stringify(storage));
+    location.reload();
+  }
 
   // Loop through all deleteItems
   [...suppressButton].forEach((item) => {
@@ -244,8 +249,7 @@ function modifyProducts() {
           articleItem.remove();
           storage.splice(i, 1);
           // Set updated value to local Storage & reload page
-          window.localStorage.setItem("allCouches", JSON.stringify(storage));
-          location.reload();
+          updateStorage();
         }
       }
     });
@@ -275,8 +279,7 @@ function modifyProducts() {
             storage[i].quantity = parsedValue;
 
             // Set updated value to local Storage & reload page
-            window.localStorage.setItem("allCouches", JSON.stringify(storage));
-            location.reload();
+            updateStorage();
           }
         }
       }
@@ -309,8 +312,10 @@ function checkForm() {
         formElement.regex.test(e.target.value) === true
       ) {
         sibling.innerHTML = "";
+        return true;
       } else {
         sibling.innerHTML = formElement.message;
+        return false;
       }
     });
   }
