@@ -75,20 +75,6 @@ function getLocalStorage() {
 }
 
 // ********************************************************************************
-// Create html element and add class if needed
-// ********************************************************************************
-function createHTML(htmlElement, classElement, innerContent) {
-  let element = document.createElement(htmlElement);
-  if (classElement) {
-    element.classList.add(classElement);
-  }
-  if (innerContent) {
-    element.innerHTML = innerContent;
-  }
-  return element;
-}
-
-// ********************************************************************************
 // Create cart element
 // ********************************************************************************
 function createCartElement(localStored, apiData) {
@@ -126,120 +112,70 @@ function createCartElement(localStored, apiData) {
     }
   }
 
-  // Loop through all localStorage elements
+  // Loop through all localStorage elements && create all Html elements using constructor
   for (let i = 0; i < localStored.length; i++) {
     // Create variable that matches element in cart and element in global API
     let apiElement = [...apiData].find(
       (element) => element._id === localStored[i].id
     );
+    // Creating every article html element
     new HtmlElement("article", "", cartItems, "cart__item", {
       id: localStored[i].id,
       color: localStored[i].color,
     });
-    new HtmlElement("div", "", cartItems.children[i], "cart__item__img");
-    new HtmlElement("div", "", cartItems.children[i], "cart__item__content");
-    new HtmlElement("img", "", cartItems.children[i].firstElementChild, "", {
+    // Variable for child selectors
+    const articles = cartItems.children[i];
+    // Creating every divs & img inside article element
+    new HtmlElement("div", "", articles, "cart__item__img");
+    new HtmlElement("img", "", articles.firstElementChild, "", {
       src: apiElement.imageUrl,
       alt: apiElement.altTxt,
     });
+    // Creating every divs for content
+    new HtmlElement("div", "", articles, "cart__item__content");
+    // Variable for child selectors
+    const description = articles.lastElementChild;
+    // Creating every divs for content description (name, color, price)
+    new HtmlElement("div", "", description, "cart__item__content__description");
+    new HtmlElement("h2", apiElement.name, description.firstElementChild);
+    new HtmlElement("p", localStored[i].color, description.firstElementChild);
+    new HtmlElement(
+      "p",
+      `${apiElement.price} €`,
+      description.firstElementChild
+    );
+    // Creating every divs for content settings (quantity, suppress button)
+    new HtmlElement("div", "", description, "cart__item__content__settings");
+    // Variable for child selectors
+    const settings = description.lastElementChild;
+    // Creating every divs for settings quantity
+    new HtmlElement(
+      "div",
+      "",
+      settings,
+      "cart__item__content__settings__quantity"
+    );
+    new HtmlElement(
+      "p",
+      `Qté : ${localStored[i].quantity}`,
+      settings.firstElementChild
+    );
+    new HtmlElement("input", "", settings.firstElementChild, "itemQuantity", {
+      type: "number",
+      name: "itemQuantity",
+      min: 1,
+      max: 100,
+      value: localStored[i].quantity,
+    });
+    // Creating delete html element
+    new HtmlElement(
+      "div",
+      "",
+      settings,
+      "cart__item__content__settings__delete"
+    );
+    new HtmlElement("p", "Supprimer", settings.lastElementChild, "deleteItem");
   }
-  // let article = new HtmlElement("article", "", cartItems, "cart__item");
-  // let articleSelector = cartItems.firstElementChild;
-  // console.log(articleSelector);
-  // let divItemImg = new HtmlElement("div", "", "", "cart__item__img");
-
-  // let apiElement = [...apiData].find((element) => element._id === item.id);
-  // let article = new HtmlElement("article", "", cartItems, "cart__item", {
-  //   id: item.id,
-  //   color: item.color,
-  // });
-  // Loop through all localStorage elements
-  // for (let i = 0; i < localStored.length; i++) {
-  //   // Create variable that matches element in cart and element in global API
-  //   let apiElement = [...apiData].find(
-  //     (element) => element._id === localStored[i].id
-  //   );
-
-  //   // Create div for item description and add html elements inside
-  //   const divContentDescription = createHTML(
-  //     "div",
-  //     "cart__item__content__description"
-  //   );
-
-  //   // Create input element for modifying quantity
-  //   const input = createHTML("input", "itemQuantity");
-
-  //   input.setAttribute("type", "number");
-  //   input.setAttribute("name", "itemQuantity");
-  //   input.setAttribute("min", 1);
-  //   input.setAttribute("max", 100);
-  //   input.setAttribute("value", localStored[i].quantity);
-
-  //   // Create div for item settings quantity & input modifier
-  //   const divContentSettingsQuant = createHTML(
-  //     "div",
-  //     "cart__item__content__settings__quantity"
-  //   );
-  //   // divContentSettingsQuant.append(input);
-
-  //   // Create p element for deleting item
-  //   const deleteItem = createHTML("p", "deleteItem", "Supprimer");
-
-  //   // Create div for item settings quantity delete
-  //   const divContentSettingsDel = createHTML(
-  //     "div",
-  //     "cart__item__content__settings__delete"
-  //   );
-  //   divContentSettingsDel.appendChild(deleteItem);
-
-  //   // Create div for item settings and add html elements inside
-  //   const divContentSettings = createHTML(
-  //     "div",
-  //     "cart__item__content__settings"
-  //   );
-  //   divContentSettings.append(divContentSettingsQuant, divContentSettingsDel);
-
-  //   // Create div for item content
-  //   const divContent = createHTML("div", "cart__item__content");
-  //   divContent.append(divContentDescription, divContentSettings);
-
-  //   // Create img element for image & alt
-  //   const image = createHTML("img");
-  //   image.setAttribute("src", apiElement.imageUrl);
-  //   image.setAttribute("alt", apiElement.altTxt);
-
-  //   // Create div for item image
-  //   const divImage = createHTML("div", "cart__item__img");
-  //   divImage.appendChild(image);
-
-  //   // Create article for each item
-  //   // const article = createHTML("article", "cart__item");
-  //   // article.setAttribute("data-id", localStored[i].id);
-  //   // article.setAttribute("data-color", localStored[i].color);
-  //   // article.append(divImage, divContent);
-
-  //   // Add each item to cart
-  //   // cartItems.appendChild(article);
-
-  //   // new HtmlElement("article", "", cartItems, "cart__item", {
-  //   //   id: localStored[i].id,
-  //   //   color: localStored[i].color,
-  //   // });
-  //   new HtmlElement("div", "", cartItems, "cart__item__img");
-  //   // new HtmlElement("h2", apiElement.name, divContentDescription);
-  //   // new HtmlElement("p", localStored[i].color, divContentDescription);
-  //   // new HtmlElement("p", `${apiElement.price} €`, divContentDescription);
-  //   // new HtmlElement(
-  //   //   "p",
-  //   //   `Qté : ${localStored[i].quantity}`,
-  //   //   divContentSettingsQuant
-  //   // );
-
-  //   // let article = new HtmlElement("article", "", "", "cart__item", {
-  //   //   id: localStored[i].id,
-  //   //   color: localStored[i].color,
-  //   // });
-  // }
 }
 
 // ********************************************************************************
