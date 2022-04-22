@@ -246,8 +246,15 @@ function modifyProducts() {
           storage[i].color === articleItemColorAttr
         ) {
           // Suppress item from DOM & storage
-          articleItem.remove();
-          storage.splice(i, 1);
+          storage = storage.filter((item) => {
+            if (
+              item.id == articleItemIdAttr &&
+              item.color == articleItemColorAttr
+            ) {
+              return false;
+            }
+            return true;
+          });
           // Set updated value to local Storage & reload page
           updateStorage();
         }
