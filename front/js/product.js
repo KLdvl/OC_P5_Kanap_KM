@@ -82,7 +82,7 @@ function addItemToCart(data) {
   };
 
   // Check if options are selected
-  if (object.color === "" || object.quantity == 0 || object.quantity > 100) {
+  if (object.color === "" || object.quantity === 0 || object.quantity > 100) {
     alert(
       "Veuillez sélectionner une couleur et/ou renseigner une quantité entre 1 et 100"
     );
