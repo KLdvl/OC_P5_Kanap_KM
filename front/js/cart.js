@@ -1,23 +1,45 @@
 // Creating variable for injecting items
 const serverUrl = "http://localhost:3000/api/products/";
 let storage = getLocalStorage();
+
 // Creating variables for selectors
 const cartItems = document.getElementById("cart__items");
 const totalQuantity = document.getElementById("totalQuantity");
 const totalPrice = document.getElementById("totalPrice");
 const order = document.getElementById("order");
 
-// Creating variables for form selectors & error messages
+// Creating variables for form selectors
 const formFirstName = document.getElementById("firstName");
-const formFirstNameError = document.getElementById("firstNameErrorMsg");
 const formLastName = document.getElementById("lastName");
-const formLastNameError = document.getElementById("lastNameErrorMsg");
 const formAddress = document.getElementById("address");
-const formAddressError = document.getElementById("addressErrorMsg");
 const formCity = document.getElementById("city");
-const formCityError = document.getElementById("cityErrorMsg");
 const formEmail = document.getElementById("email");
-const formEmailError = document.getElementById("emailErrorMsg");
+// Selector used for checking form with Regex
+const formFields = document.querySelectorAll(
+  'input[type="text"],input[type="email"]'
+);
+
+// ********************************************************************************
+// Regex for each form element
+// ********************************************************************************
+const nameRegex = new RegExp("^[a-zA-Z àâäéèêëïîôöùûüç'-,.]+$");
+const addressRegex = new RegExp(
+  "^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç'-]+)+"
+);
+const cityRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç'-]+$");
+const emailRegex = new RegExp(
+  "^[a-zA-Z0-9-_]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
+);
+// Create array of regex
+const regexList = [nameRegex, nameRegex, addressRegex, cityRegex, emailRegex];
+// Create array of error messages for form field
+const errorMessages = [
+  "Le prénom ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "Le nom de famille ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "L'adresse entrée doit être valide",
+  "La ville ne doit pas contenir de chiffres ou de caractères spéciaux",
+  "L'addresse email doit être valide",
+];
 
 // ********************************************************************************
 // Getting data from API
@@ -35,11 +57,7 @@ fetch(serverUrl)
     createCartElement(storage, data);
     calculateTotal(storage, data);
     modifyProducts();
-    checkForm(formFirstName, nameRegex, formFirstNameError, errorMessages[0]);
-    checkForm(formLastName, nameRegex, formLastNameError, errorMessages[1]);
-    checkForm(formAddress, addressRegex, formAddressError, errorMessages[2]);
-    checkForm(formCity, cityRegex, formCityError, errorMessages[3]);
-    checkForm(formEmail, emailRegex, formEmailError, errorMessages[4]);
+    checkForm();
     passOrder();
   })
   .catch(function (err) {
@@ -58,109 +76,106 @@ function getLocalStorage() {
 }
 
 // ********************************************************************************
-// Create html element and add class if needed
-// ********************************************************************************
-function createHTML(htmlElement, classElement) {
-  let element = document.createElement(htmlElement);
-  if (classElement) {
-    element.classList.add(classElement);
-  }
-  return element;
-}
-
-// ********************************************************************************
 // Create cart element
 // ********************************************************************************
 function createCartElement(localStored, apiData) {
-  // Loop through all localStorage elements
+  class HtmlElement {
+    constructor(type, text, append, className, attribute) {
+      (this.type = type),
+        (this.text = text),
+        (this.append = append),
+        (this.class = className),
+        (this.attribute = attribute),
+        (this.createHtml = function () {
+          let element = document.createElement(this.type);
+          element.innerHTML = this.text;
+          if (this.class) {
+            element.classList.add(this.class);
+          }
+          if (this.attribute) {
+            if (
+              Object.keys(this.attribute).includes("id") &&
+              Object.keys(this.attribute).includes("color")
+            ) {
+              element.dataset.id = this.attribute.id;
+              element.dataset.color = this.attribute.color;
+            } else {
+              let attributes = Object.entries(this.attribute);
+              // insert attributes dynamically
+              for (let i = 0; i < attributes.length; i++) {
+                element.setAttribute(attributes[i][0], attributes[i][1]);
+              }
+            }
+          }
+          this.append.append(element);
+        });
+      this.createHtml();
+    }
+  }
+
+  // Loop through all localStorage elements && create all Html elements using constructor
   for (let i = 0; i < localStored.length; i++) {
     // Create variable that matches element in cart and element in global API
     let apiElement = [...apiData].find(
       (element) => element._id === localStored[i].id
     );
-
-    // Create H2 element for name
-    const h2 = createHTML("h2");
-    h2.innerHTML = apiElement.name;
-
-    // Create p element for color
-    const color = createHTML("p");
-    color.innerHTML = localStored[i].color;
-
-    // Create p element for price
-    const price = createHTML("p");
-    price.innerHTML = apiElement.price + " €";
-
-    // Create div for item description and add html elements inside
-    const divContentDescription = createHTML(
-      "div",
-      "cart__item__content__description"
+    // Creating every article html element
+    new HtmlElement("article", "", cartItems, "cart__item", {
+      id: localStored[i].id,
+      color: localStored[i].color,
+    });
+    // Variable for child selectors
+    const articles = cartItems.children[i];
+    // Creating every divs & img inside article element
+    new HtmlElement("div", "", articles, "cart__item__img");
+    new HtmlElement("img", "", articles.firstElementChild, "", {
+      src: apiElement.imageUrl,
+      alt: apiElement.altTxt,
+    });
+    // Creating every divs for content
+    new HtmlElement("div", "", articles, "cart__item__content");
+    // Variable for child selectors
+    const description = articles.lastElementChild;
+    // Creating every divs for content description (name, color, price)
+    new HtmlElement("div", "", description, "cart__item__content__description");
+    new HtmlElement("h2", apiElement.name, description.firstElementChild);
+    new HtmlElement("p", localStored[i].color, description.firstElementChild);
+    new HtmlElement(
+      "p",
+      `${apiElement.price} €`,
+      description.firstElementChild
     );
-    divContentDescription.appendChild(h2);
-    divContentDescription.appendChild(color);
-    divContentDescription.appendChild(price);
-
-    // Create p element for quantity
-    const quantity = createHTML("p");
-    quantity.innerHTML = "Qté : " + localStored[i].quantity;
-
-    // Create input element for modifying quantity
-    const input = createHTML("input", "itemQuantity");
-    input.setAttribute("type", "number");
-    input.setAttribute("name", "itemQuantity");
-    input.setAttribute("min", 1);
-    input.setAttribute("max", 100);
-    input.setAttribute("value", localStored[i].quantity);
-
-    // Create div for item settings quantity & input modifier
-    const divContentSettingsQuant = createHTML(
+    // Creating every divs for content settings (quantity, suppress button)
+    new HtmlElement("div", "", description, "cart__item__content__settings");
+    // Variable for child selectors
+    const settings = description.lastElementChild;
+    // Creating every divs for settings quantity
+    new HtmlElement(
       "div",
+      "",
+      settings,
       "cart__item__content__settings__quantity"
     );
-    divContentSettingsQuant.appendChild(quantity);
-    divContentSettingsQuant.appendChild(input);
-    // Create p element for deleting item
-    const deleteItem = createHTML("p", "deleteItem");
-    deleteItem.innerHTML = "Supprimer";
-
-    // Create div for item settings quantity delete
-    const divContentSettingsDel = createHTML(
+    new HtmlElement(
+      "p",
+      `Qté : ${localStored[i].quantity}`,
+      settings.firstElementChild
+    );
+    new HtmlElement("input", "", settings.firstElementChild, "itemQuantity", {
+      type: "number",
+      name: "itemQuantity",
+      min: 1,
+      max: 100,
+      value: localStored[i].quantity,
+    });
+    // Creating delete html element
+    new HtmlElement(
       "div",
+      "",
+      settings,
       "cart__item__content__settings__delete"
     );
-    divContentSettingsDel.appendChild(deleteItem);
-
-    // Create div for item settings and add html elements inside
-    const divContentSettings = createHTML(
-      "div",
-      "cart__item__content__settings"
-    );
-    divContentSettings.appendChild(divContentSettingsQuant);
-    divContentSettings.appendChild(divContentSettingsDel);
-
-    // Create div for item content
-    const divContent = createHTML("div", "cart__item__content");
-    divContent.appendChild(divContentDescription);
-    divContent.appendChild(divContentSettings);
-
-    // Create img element for image & alt
-    const image = createHTML("img");
-    image.setAttribute("src", apiElement.imageUrl);
-    image.setAttribute("alt", apiElement.altTxt);
-
-    // Create div for item image
-    const divImage = createHTML("div", "cart__item__img");
-    divImage.appendChild(image);
-
-    // Create article for each item
-    const article = createHTML("article", "cart__item");
-    article.setAttribute("data-id", localStored[i].id);
-    article.setAttribute("data-color", localStored[i].color);
-    article.appendChild(divImage);
-    article.appendChild(divContent);
-
-    // Add each item to cart
-    cartItems.appendChild(article);
+    new HtmlElement("p", "Supprimer", settings.lastElementChild, "deleteItem");
   }
 }
 
@@ -190,7 +205,7 @@ function calculateTotal(storage, apiData) {
       (element) => element._id === storage[i].id
     );
 
-    // Add prices to array
+    // Add prices to arrayPrice
     arrayPrice.push(apiElement.price * storage[i].quantity);
   }
   if (arrayPrice.length === 0) {
@@ -210,6 +225,10 @@ function modifyProducts() {
   // Create node list for each element in cart
   const itemQuantityInput = document.getElementsByClassName("itemQuantity");
   const suppressButton = document.getElementsByClassName("deleteItem");
+  function updateStorage() {
+    window.localStorage.setItem("allCouches", JSON.stringify(storage));
+    location.reload();
+  }
 
   // Loop through all deleteItems
   [...suppressButton].forEach((item) => {
@@ -227,11 +246,17 @@ function modifyProducts() {
           storage[i].color === articleItemColorAttr
         ) {
           // Suppress item from DOM & storage
-          articleItem.remove();
-          storage.splice(i, 1);
+          storage = storage.filter((item) => {
+            if (
+              item.id == articleItemIdAttr &&
+              item.color == articleItemColorAttr
+            ) {
+              return false;
+            }
+            return true;
+          });
           // Set updated value to local Storage & reload page
-          window.localStorage.setItem("allCouches", JSON.stringify(storage));
-          location.reload();
+          updateStorage();
         }
       }
     });
@@ -261,8 +286,7 @@ function modifyProducts() {
             storage[i].quantity = parsedValue;
 
             // Set updated value to local Storage & reload page
-            window.localStorage.setItem("allCouches", JSON.stringify(storage));
-            location.reload();
+            updateStorage();
           }
         }
       }
@@ -271,40 +295,37 @@ function modifyProducts() {
 }
 
 // ********************************************************************************
-// Regex for each form element
-// ********************************************************************************
-const nameRegex = new RegExp("^[a-zA-Z àâäéèêëïîôöùûüç'-,.]+$");
-const addressRegex = new RegExp(
-  "^[0-9]{1,3}(?:(?:[,. ]){1}[-a-zA-Zàâäéèêëïîôöùûüç'-]+)+"
-);
-const cityRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç'-]+$");
-const emailRegex = new RegExp(
-  "^[a-zA-Z0-9-_]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
-);
-// Error messages for each case
-const errorMessages = [
-  "Le prénom ne doit pas contenir de chiffres ou de caractères spéciaux",
-  "Le nom de famille ne doit pas contenir de chiffres ou de caractères spéciaux",
-  "L'adresse entrée doit être valide",
-  "La ville ne doit pas contenir de chiffres ou de caractères spéciaux",
-  "L'addresse email doit être valide",
-];
-
-// ********************************************************************************
 // Function to check each item of the form
 // ********************************************************************************
-function checkForm(formElement, regexType, formElementError, message) {
-  formElement.addEventListener("input", (e) => {
-    if (e.target.value === null || e.target.value === "") {
-      formElementError.innerHTML = "";
-    } else {
-      if (regexType.test(e.target.value) === true) {
-        formElementError.innerHTML = "";
-      } else {
-        formElementError.innerHTML = message;
-      }
+function checkForm() {
+  class FormChecker {
+    constructor(formField, regex, message) {
+      (this.formField = formField),
+        (this.regex = regex),
+        (this.message = message);
     }
-  });
+  }
+  for (let i = 0; i < formFields.length; i++) {
+    let formElement = new FormChecker(
+      formFields[i],
+      regexList[i],
+      errorMessages[i]
+    );
+    let sibling = formElement.formField.nextElementSibling;
+    formElement.formField.addEventListener("input", (e) => {
+      if (
+        e.target.value === null ||
+        e.target.value === "" ||
+        formElement.regex.test(e.target.value) === true
+      ) {
+        sibling.innerHTML = "";
+        return true;
+      } else {
+        sibling.innerHTML = formElement.message;
+        return false;
+      }
+    });
+  }
 }
 
 // ********************************************************************************
@@ -343,6 +364,7 @@ function passOrder() {
       // Envoi du formulaire
       const orderJson = JSON.stringify(order);
 
+      // POST method for order & contact
       fetch(serverUrl + "order", {
         method: "POST",
         headers: {
