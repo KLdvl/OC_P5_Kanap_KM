@@ -28,7 +28,7 @@ const addressRegex = new RegExp(
 );
 const cityRegex = new RegExp("^[a-zA-Zàâäéèêëïîôöùûüç'-]+$");
 const emailRegex = new RegExp(
-  "^[a-zA-Z0-9-_]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
+  "^[a-zA-Z0-9-._]+[@]{1}[a-zA-Z0-9-_]+[.]{1}[a-zA-Z]{2,}$"
 );
 // Create array of regex
 const regexList = [nameRegex, nameRegex, addressRegex, cityRegex, emailRegex];
