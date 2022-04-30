@@ -88,10 +88,14 @@ function addItemToCart(data) {
     );
   } else {
     // Check if element exists in localStorage
-    if (existingStorage.find((element) => element.color === object.color)) {
+    if (
+      existingStorage.find(
+        (element) => element.color === object.color && element.id === object.id
+      )
+    ) {
       // Get index of existing element in localStorage
       let indexValue = existingStorage.findIndex(
-        (element) => element.color === object.color
+        (element) => element.color === object.color && element.id === object.id
       );
 
       // Increment value of stored element
